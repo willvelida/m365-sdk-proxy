@@ -41,7 +41,6 @@ namespace M365ProxyAgent.Middleware
         /// <param name="exception">The exception that occurred.</param>
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            // Resolve ICorrelationService from the request scope
             var correlationService = context.RequestServices.GetRequiredService<ICorrelationService>();
             var correlationId = correlationService.CorrelationId;
 

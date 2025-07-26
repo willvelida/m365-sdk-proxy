@@ -16,15 +16,12 @@ using Microsoft.Agents.Storage.Transcript;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add configuration validation services early
 builder.Services.AddConfigurationValidation();
 
-// Add exception handling services
 builder.Services.AddExceptionHandling();
 
 var copilotSettings = new CopilotStudioClientSettings(builder.Configuration.GetSection("CopilotStudioClientSettings"));
 
-// Add OpenTelemetry and use Azure Monitor
 builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
 {
     options.ConnectionString = builder.Configuration["connectionString"];
@@ -51,10 +48,8 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 // Add AgentApplicationOptions from config.
 builder.AddAgentApplicationOptions();
 
-// Add AgentApplicationOptions.  This will use DI'd services and IConfiguration for construction.
 builder.Services.AddTransient<AgentApplicationOptions>();
 
-// Add the bot (which is transient)
 builder.AddAgent<ProxyAgent>();
 
 builder.Services
@@ -64,7 +59,6 @@ builder.Services
         var logger = s.GetRequiredService<ILoggerFactory>().CreateLogger<CopilotClient>();
         return new CopilotClient(copilotSettings, s.GetRequiredService<IHttpClientFactory>(), logger, "mcs");
     })
-    // Register SOLID-compliant services
     .AddScoped<IConversationService, ConversationService>()
     .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
     .AddScoped<WelcomeMessageHandler>()
@@ -80,7 +74,6 @@ app.UseExceptionHandling();
 
 app.UseRouting();
 
-// Add authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

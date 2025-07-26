@@ -11,7 +11,6 @@ namespace M365ProxyAgent.Validation
     {
         public CopilotStudioClientSettingsValidator()
         {
-            // Tenant ID validation
             RuleFor(x => x.TenantId)
                 .NotEmpty()
                 .WithMessage("TenantId is required for authentication")
@@ -19,7 +18,6 @@ namespace M365ProxyAgent.Validation
                 .WithMessage("TenantId must be a valid GUID format")
                 .When(x => !string.IsNullOrEmpty(x.TenantId));
 
-            // Application Client ID validation
             RuleFor(x => x.AppClientId)
                 .NotEmpty()
                 .WithMessage("AppClientId is required for authentication")
@@ -27,7 +25,6 @@ namespace M365ProxyAgent.Validation
                 .WithMessage("AppClientId must be a valid GUID format")
                 .When(x => !string.IsNullOrEmpty(x.AppClientId));
 
-            // Application Client Secret validation
             RuleFor(x => x.AppClientSecret)
                 .NotEmpty()
                 .WithMessage("AppClientSecret is required for authentication")
@@ -36,7 +33,6 @@ namespace M365ProxyAgent.Validation
                 .Must(NotContainWhitespace)
                 .WithMessage("AppClientSecret cannot contain whitespace characters");
 
-            // S2S Connection validation
             RuleFor(x => x.UseS2SConnection)
                 .NotNull()
                 .WithMessage("UseS2SConnection must be explicitly set to true or false");

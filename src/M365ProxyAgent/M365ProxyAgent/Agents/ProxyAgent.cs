@@ -24,7 +24,6 @@ namespace M365ProxyAgent.Agents
             _messageHandlerFactory = messageHandlerFactory ?? throw new ArgumentNullException(nameof(messageHandlerFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            // Register event handlers using the factory pattern
             OnConversationUpdate(ConversationUpdateEvents.MembersAdded, HandleConversationUpdateAsync);
             OnActivity(ActivityTypes.Message, HandleMessageAsync, rank: RouteRank.Last);
         }
