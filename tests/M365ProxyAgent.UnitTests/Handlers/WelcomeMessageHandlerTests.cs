@@ -8,31 +8,27 @@ using Microsoft.Agents.Core.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace M365ProxyAgent.Tests.Handlers
+namespace M365ProxyAgent.UnitTests.Handlers
 {
-    public class RegularMessageHandlerTests
+    public class WelcomeMessageHandlerTests
     {
         private const string TestCorrelationId = "test-correlation-id";
         private const string TestConversationId = "test-conversation-id";
-        private const string TestUserId = "user-id";
-        private const string TestUserName = "Test User";
-        private const string TestMessageText = "Hello, bot!";
-        private const string TestResponseText = "Hello! How can I help you?";
-        private const string ExpectedTurnContextNullMessage = "Value cannot be null. (Parameter 'turnContext')";
-        private const string ExpectedFailedProcessMessage = "Failed to process user message";
-        private const string ExpectedProcessMessageOperation = "ProcessMessage";
+        private const string TestNewMemberId = "new-member-id";
+        private const string TestRecipientId = "bot-id";
+        private const string TestMemberName = "New Member";
 
         private readonly Mock<IConversationService> _mockConversationService;
         private readonly Mock<ICorrelationService> _mockCorrelationService;
-        private readonly Mock<ILogger<RegularMessageHandler>> _mockLogger;
+        private readonly Mock<ILogger<WelcomeMessageHandler>> _mockLogger;
         private readonly Mock<ITurnContext> _mockTurnContext;
         private readonly Mock<ITurnState> _mockTurnState;
 
-        public RegularMessageHandlerTests()
+        public WelcomeMessageHandlerTests()
         {
             _mockConversationService = new Mock<IConversationService>();
             _mockCorrelationService = new Mock<ICorrelationService>();
-            _mockLogger = new Mock<ILogger<RegularMessageHandler>>();
+            _mockLogger = new Mock<ILogger<WelcomeMessageHandler>>();
             _mockTurnContext = new Mock<ITurnContext>();
             _mockTurnState = new Mock<ITurnState>();
 
@@ -40,19 +36,19 @@ namespace M365ProxyAgent.Tests.Handlers
         }
 
         [Fact]
-        public async Task HandleAsync_WithUserMessage_ProcessesMessageSuccessfully()
+        public async Task HandleAsync_WithMembersAdded_ProcessesWelcomeMessage()
         {
             // Arrange
-            var activity = CreateMessageActivity();
+            var activity = CreateConversationUpdateActivity();
             _mockTurnContext.Setup(tc => tc.Activity).Returns(activity);
 
-            var responseActivities = new List<Activity>
+            var welcomeActivities = new List<Activity>
             {
-                new Activity { Type = ActivityTypes.Message, Text = TestResponseText }
+                new Activity { Type = ActivityTypes.Message, Text = "Welcome!" }
             };
 
-            _mockConversationService.Setup(cs => cs.ProcessMessageAsync(activity, It.IsAny<CancellationToken>()))
-                .Returns(CreateAsyncEnumerable(responseActivities));
+            _mockConversationService.Setup(cs => cs.StartConversationAsync(_mockTurnContext.Object, It.IsAny<CancellationToken>()))
+                .Returns(CreateAsyncEnumerable(welcomeActivities));
 
             _mockTurnContext.Setup(tc => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ResourceResponse());
@@ -63,7 +59,7 @@ namespace M365ProxyAgent.Tests.Handlers
             await handler.HandleAsync(_mockTurnContext.Object, _mockTurnState.Object, CancellationToken.None);
 
             // Assert
-            _mockConversationService.Verify(cs => cs.ProcessMessageAsync(activity, It.IsAny<CancellationToken>()), Times.Once);
+            _mockConversationService.Verify(cs => cs.StartConversationAsync(_mockTurnContext.Object, It.IsAny<CancellationToken>()), Times.Once);
             _mockTurnContext.Verify(tc => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -78,18 +74,18 @@ namespace M365ProxyAgent.Tests.Handlers
 
             // Assert
             await act.Should().ThrowAsync<ArgumentNullException>()
-                .WithMessage(ExpectedTurnContextNullMessage);
+                .WithMessage("Value cannot be null. (Parameter 'turnContext')");
         }
 
         [Fact]
         public async Task HandleAsync_WithConversationServiceFailure_ThrowsCopilotClientException()
         {
             // Arrange
-            var activity = CreateMessageActivity();
+            var activity = CreateConversationUpdateActivity();
             _mockTurnContext.Setup(tc => tc.Activity).Returns(activity);
 
             var originalException = new InvalidOperationException("Service unavailable");
-            _mockConversationService.Setup(cs => cs.ProcessMessageAsync(activity, It.IsAny<CancellationToken>()))
+            _mockConversationService.Setup(cs => cs.StartConversationAsync(_mockTurnContext.Object, It.IsAny<CancellationToken>()))
                 .Throws(originalException);
 
             var handler = CreateHandler();
@@ -99,29 +95,32 @@ namespace M365ProxyAgent.Tests.Handlers
 
             // Assert
             var exception = await act.Should().ThrowAsync<CopilotClientException>()
-                .WithMessage(ExpectedFailedProcessMessage);
+                .WithMessage("Failed to process welcome message");
             
             exception.Which.InnerException.Should().Be(originalException);
-            exception.Which.Operation.Should().Be(ExpectedProcessMessageOperation);
+            exception.Which.Operation.Should().Be("WelcomeMessage");
             exception.Which.CorrelationId.Should().Be(TestCorrelationId);
         }
 
-        private RegularMessageHandler CreateHandler()
+        private WelcomeMessageHandler CreateHandler()
         {
-            return new RegularMessageHandler(
+            return new WelcomeMessageHandler(
                 _mockConversationService.Object,
                 _mockCorrelationService.Object,
                 _mockLogger.Object);
         }
 
-        private static Activity CreateMessageActivity()
+        private static Activity CreateConversationUpdateActivity()
         {
             return new Activity
             {
-                Type = ActivityTypes.Message,
-                Text = TestMessageText,
+                Type = ActivityTypes.ConversationUpdate,
                 Conversation = new ConversationAccount { Id = TestConversationId },
-                From = new ChannelAccount { Id = TestUserId, Name = TestUserName }
+                Recipient = new ChannelAccount { Id = TestRecipientId },
+                MembersAdded = new List<ChannelAccount>
+                {
+                    new ChannelAccount { Id = TestNewMemberId, Name = TestMemberName }
+                }
             };
         }
 

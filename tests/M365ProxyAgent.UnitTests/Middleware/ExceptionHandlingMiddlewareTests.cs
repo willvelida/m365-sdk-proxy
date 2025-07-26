@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System.Text.Json;
 
-namespace M365ProxyAgent.Tests.Middleware
+namespace M365ProxyAgent.UnitTests.Middleware
 {
     public class ExceptionHandlingMiddlewareTests
     {

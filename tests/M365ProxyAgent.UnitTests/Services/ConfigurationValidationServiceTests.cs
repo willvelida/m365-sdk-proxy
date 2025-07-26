@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace M365ProxyAgent.Tests.Services
+namespace M365ProxyAgent.UnitTests.Services
 {
     public class ConfigurationValidationServiceTests
     {

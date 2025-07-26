@@ -1,6 +1,6 @@
 using Microsoft.Agents.Core.Models;
 
-namespace M365ProxyAgent.Tests.Builders
+namespace M365ProxyAgent.UnitTests.Builders
 {
     public class ActivityBuilder
     {

@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace M365ProxyAgent.Tests.Handlers
+namespace M365ProxyAgent.UnitTests.Handlers
 {
     public class MessageHandlerFactoryTests
     {

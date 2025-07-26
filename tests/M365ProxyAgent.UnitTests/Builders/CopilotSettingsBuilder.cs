@@ -1,7 +1,7 @@
 using M365ProxyAgent.Configuration;
 using Microsoft.Extensions.Configuration;
 
-namespace M365ProxyAgent.Tests.Builders
+namespace M365ProxyAgent.UnitTests.Builders
 {
     public class CopilotSettingsBuilder
     {

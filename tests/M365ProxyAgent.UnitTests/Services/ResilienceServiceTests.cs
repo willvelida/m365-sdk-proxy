@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Polly;
 
-namespace M365ProxyAgent.Tests.Services
+namespace M365ProxyAgent.UnitTests.Services
 {
     public class ResilienceServiceTests
     {

@@ -7,7 +7,7 @@ using Microsoft.Agents.Core.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace M365ProxyAgent.Tests.Agents
+namespace M365ProxyAgent.UnitTests.Agents
 {
     public class ProxyAgentTests
     {

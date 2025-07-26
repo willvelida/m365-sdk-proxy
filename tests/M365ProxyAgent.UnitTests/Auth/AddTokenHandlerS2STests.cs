@@ -13,7 +13,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using Xunit;
 
-namespace M365ProxyAgent.Tests.Auth
+namespace M365ProxyAgent.UnitTests.Auth
 {
     public class AddTokenHandlerS2STests
     {

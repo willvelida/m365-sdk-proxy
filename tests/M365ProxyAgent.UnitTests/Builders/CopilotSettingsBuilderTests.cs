@@ -1,8 +1,8 @@
 using FluentAssertions;
 using M365ProxyAgent.Configuration;
-using M365ProxyAgent.Tests.Builders;
+using M365ProxyAgent.UnitTests.Builders;
 
-namespace M365ProxyAgent.Tests.Builders
+namespace M365ProxyAgent.UnitTests.Builders
 {
     public class CopilotSettingsBuilderTests
     {

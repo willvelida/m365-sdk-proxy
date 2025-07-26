@@ -1,7 +1,7 @@
 using FluentAssertions;
 using M365ProxyAgent.Services;
 
-namespace M365ProxyAgent.Tests.Services
+namespace M365ProxyAgent.UnitTests.Services
 {
     public class CorrelationServiceTests
     {

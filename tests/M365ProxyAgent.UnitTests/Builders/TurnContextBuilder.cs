@@ -2,7 +2,7 @@ using Microsoft.Agents.Builder;
 using Microsoft.Agents.Core.Models;
 using Moq;
 
-namespace M365ProxyAgent.Tests.Builders
+namespace M365ProxyAgent.UnitTests.Builders
 {
     public class TurnContextBuilder
     {
