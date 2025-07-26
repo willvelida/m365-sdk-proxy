@@ -3,6 +3,7 @@ using M365ProxyAgent.Exceptions;
 using M365ProxyAgent.Interfaces;
 using M365ProxyAgent.Middleware;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Text.Json;
@@ -27,17 +28,27 @@ namespace M365ProxyAgent.UnitTests.Middleware
         [Fact]
         public async Task InvokeAsync_WithNoException_CallsNextDelegate()
         {
-            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object, _mockCorrelationService.Object);
-            var context = new DefaultHttpContext();
+            // Arrange
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(ICorrelationService)))
+                              .Returns(_mockCorrelationService.Object);
 
+            var context = new DefaultHttpContext();
+            context.RequestServices = mockServiceProvider.Object;
+
+            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
+
+            // Act
             await middleware.InvokeAsync(context);
 
+            // Assert
             _mockNext.Verify(next => next(context), Times.Once);
         }
 
         [Fact]
         public async Task InvokeAsync_WithProxyAgentException_Returns500StatusWithErrorResponse()
         {
+            // Arrange
             var exceptionMessage = "Test configuration error";
             var exception = new ConfigurationException(exceptionMessage);
             
@@ -45,8 +56,13 @@ namespace M365ProxyAgent.UnitTests.Middleware
                 .ThrowsAsync(exception);
             _mockCorrelationService.Setup(cs => cs.CorrelationId).Returns(TestCorrelationId);
 
-            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object, _mockCorrelationService.Object);
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(ICorrelationService)))
+                              .Returns(_mockCorrelationService.Object);
+
+            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
             var context = new DefaultHttpContext();
+            context.RequestServices = mockServiceProvider.Object;
             context.Response.Body = new MemoryStream();
 
             await middleware.InvokeAsync(context);
@@ -65,6 +81,7 @@ namespace M365ProxyAgent.UnitTests.Middleware
         [Fact]
         public async Task InvokeAsync_WithAuthenticationException_Returns401StatusWithErrorResponse()
         {
+            // Arrange
             var exceptionMessage = "Token validation failed";
             var exception = new AuthenticationException(exceptionMessage);
             
@@ -72,8 +89,13 @@ namespace M365ProxyAgent.UnitTests.Middleware
                 .ThrowsAsync(exception);
             _mockCorrelationService.Setup(cs => cs.CorrelationId).Returns(TestCorrelationId);
 
-            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object, _mockCorrelationService.Object);
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(ICorrelationService)))
+                              .Returns(_mockCorrelationService.Object);
+
+            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
             var context = new DefaultHttpContext();
+            context.RequestServices = mockServiceProvider.Object;
             context.Response.Body = new MemoryStream();
 
             await middleware.InvokeAsync(context);
@@ -92,6 +114,7 @@ namespace M365ProxyAgent.UnitTests.Middleware
         [Fact]
         public async Task InvokeAsync_WithCopilotClientException_Returns502StatusWithErrorResponse()
         {
+            // Arrange
             var exceptionMessage = "Failed to communicate with Copilot Studio";
             var exception = new CopilotClientException(exceptionMessage);
             
@@ -99,8 +122,13 @@ namespace M365ProxyAgent.UnitTests.Middleware
                 .ThrowsAsync(exception);
             _mockCorrelationService.Setup(cs => cs.CorrelationId).Returns(TestCorrelationId);
 
-            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object, _mockCorrelationService.Object);
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(ICorrelationService)))
+                              .Returns(_mockCorrelationService.Object);
+
+            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
             var context = new DefaultHttpContext();
+            context.RequestServices = mockServiceProvider.Object;
             context.Response.Body = new MemoryStream();
 
             await middleware.InvokeAsync(context);
@@ -119,6 +147,7 @@ namespace M365ProxyAgent.UnitTests.Middleware
         [Fact]
         public async Task InvokeAsync_WithValidationException_Returns400StatusWithErrorResponse()
         {
+            // Arrange
             var exceptionMessage = "Invalid request data";
             var exception = new ValidationException(exceptionMessage);
             
@@ -126,8 +155,13 @@ namespace M365ProxyAgent.UnitTests.Middleware
                 .ThrowsAsync(exception);
             _mockCorrelationService.Setup(cs => cs.CorrelationId).Returns(TestCorrelationId);
 
-            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object, _mockCorrelationService.Object);
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(ICorrelationService)))
+                              .Returns(_mockCorrelationService.Object);
+
+            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
             var context = new DefaultHttpContext();
+            context.RequestServices = mockServiceProvider.Object;
             context.Response.Body = new MemoryStream();
 
             await middleware.InvokeAsync(context);
@@ -146,6 +180,7 @@ namespace M365ProxyAgent.UnitTests.Middleware
         [Fact]
         public async Task InvokeAsync_WithGenericException_Returns500StatusWithErrorResponse()
         {
+            // Arrange
             var exceptionMessage = "An unexpected error occurred";
             var exception = new InvalidOperationException(exceptionMessage);
             
@@ -153,8 +188,13 @@ namespace M365ProxyAgent.UnitTests.Middleware
                 .ThrowsAsync(exception);
             _mockCorrelationService.Setup(cs => cs.CorrelationId).Returns(TestCorrelationId);
 
-            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object, _mockCorrelationService.Object);
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            mockServiceProvider.Setup(sp => sp.GetService(typeof(ICorrelationService)))
+                              .Returns(_mockCorrelationService.Object);
+
+            var middleware = new ExceptionHandlingMiddleware(_mockNext.Object, _mockLogger.Object);
             var context = new DefaultHttpContext();
+            context.RequestServices = mockServiceProvider.Object;
             context.Response.Body = new MemoryStream();
 
             await middleware.InvokeAsync(context);
