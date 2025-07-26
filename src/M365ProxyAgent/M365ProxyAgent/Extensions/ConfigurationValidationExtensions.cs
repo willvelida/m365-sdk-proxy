@@ -18,8 +18,9 @@ namespace M365ProxyAgent.Extensions
         /// <returns>The service collection for chaining</returns>
         public static IServiceCollection AddConfigurationValidation(this IServiceCollection services)
         {
-            // Add FluentValidation services
-            services.AddValidatorsFromAssemblyContaining<CopilotStudioClientSettingsValidator>();
+            // Register FluentValidation validators as transient instead of scoped
+            services.AddValidatorsFromAssemblyContaining<CopilotStudioClientSettingsValidator>(
+                ServiceLifetime.Transient);
 
             // Add configuration validation service
             services.AddSingleton<IConfigurationValidationService, ConfigurationValidationService>();

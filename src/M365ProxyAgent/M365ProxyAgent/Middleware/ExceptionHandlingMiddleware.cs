@@ -12,12 +12,10 @@ namespace M365ProxyAgent.Middleware
     /// </summary>
     public class ExceptionHandlingMiddleware(
         RequestDelegate next,
-        ILogger<ExceptionHandlingMiddleware> logger,
-        ICorrelationService correlationService)
+        ILogger<ExceptionHandlingMiddleware> logger)
     {
         private readonly RequestDelegate _next = next ?? throw new ArgumentNullException(nameof(next));
         private readonly ILogger<ExceptionHandlingMiddleware> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        private readonly ICorrelationService _correlationService = correlationService ?? throw new ArgumentNullException(nameof(correlationService));
         private static readonly string[] Body = ["Service configuration issue detected"];
 
         /// <summary>
@@ -43,7 +41,9 @@ namespace M365ProxyAgent.Middleware
         /// <param name="exception">The exception that occurred.</param>
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            var correlationId = _correlationService.CorrelationId;
+            // Resolve ICorrelationService from the request scope
+            var correlationService = context.RequestServices.GetRequiredService<ICorrelationService>();
+            var correlationId = correlationService.CorrelationId;
 
             _logger.LogError(exception,
                 "Unhandled exception occurred. CorrelationId: {CorrelationId}, RequestPath: {RequestPath}",

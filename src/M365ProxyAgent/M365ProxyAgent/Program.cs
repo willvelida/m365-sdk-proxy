@@ -1,4 +1,4 @@
-using Azure.Monitor.OpenTelemetry.AspNetCore;
+﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
 using M365ProxyAgent.Agents;
 using M365ProxyAgent.Auth;
 using M365ProxyAgent.Configuration;
@@ -69,17 +69,13 @@ builder.Services
     .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
     .AddScoped<WelcomeMessageHandler>()
     .AddScoped<RegularMessageHandler>()
-    // Register correlation service for request tracking
     .AddScoped<ICorrelationService, CorrelationService>()
-    // Register resilience service for retry policies and circuit breakers
     .AddSingleton<IResilienceService, ResilienceService>();
 
 var app = builder.Build();
 
-// Validate configuration during startup
 app.Services.ValidateStartupConfiguration(builder.Configuration);
 
-// Add global exception handling middleware (should be early in pipeline)
 app.UseExceptionHandling();
 
 app.UseRouting();
