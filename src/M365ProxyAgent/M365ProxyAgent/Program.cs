@@ -63,6 +63,7 @@ builder.Services
     .AddScoped<IMessageHandlerFactory, MessageHandlerFactory>()
     .AddScoped<WelcomeMessageHandler>()
     .AddScoped<RegularMessageHandler>()
+    .AddScoped<EventMessageHandler>()
     .AddScoped<ICorrelationService, CorrelationService>()
     .AddSingleton<IResilienceService, ResilienceService>();
 

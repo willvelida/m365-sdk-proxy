@@ -56,6 +56,23 @@ namespace M365ProxyAgent.UnitTests.Handlers
         }
 
         [Fact]
+        public void CreateHandler_WithEventActivity_ReturnsEventMessageHandler()
+        {
+            // Arrange
+            var mockEventHandler = CreateMockEventMessageHandler();
+            _mockServiceProvider.Setup(sp => sp.GetService(typeof(EventMessageHandler)))
+                .Returns(mockEventHandler.Object);
+
+            // Act
+            var result = _factory.CreateHandler(ActivityTypes.Event);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<IMessageHandler>();
+            _mockServiceProvider.Verify(sp => sp.GetService(typeof(EventMessageHandler)), Times.Once);
+        }
+
+        [Fact]
         public void CreateHandler_WithUnknownActivityType_ReturnsNull()
         {
             // Act
@@ -92,6 +109,14 @@ namespace M365ProxyAgent.UnitTests.Handlers
                 Mock.Of<IConversationService>(),
                 Mock.Of<ICorrelationService>(),
                 Mock.Of<ILogger<RegularMessageHandler>>());
+        }
+
+        private static Mock<EventMessageHandler> CreateMockEventMessageHandler()
+        {
+            return new Mock<EventMessageHandler>(
+                Mock.Of<IConversationService>(),
+                Mock.Of<ICorrelationService>(),
+                Mock.Of<ILogger<EventMessageHandler>>());
         }
     }
 }

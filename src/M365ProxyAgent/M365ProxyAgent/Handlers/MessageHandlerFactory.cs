@@ -18,6 +18,7 @@ namespace M365ProxyAgent.Handlers
             {
                 ActivityTypes.ConversationUpdate => _serviceProvider.GetService<WelcomeMessageHandler>(),
                 ActivityTypes.Message => _serviceProvider.GetService<RegularMessageHandler>(),
+                ActivityTypes.Event => _serviceProvider.GetService<EventMessageHandler>(),
                 _ => null
             };
         }

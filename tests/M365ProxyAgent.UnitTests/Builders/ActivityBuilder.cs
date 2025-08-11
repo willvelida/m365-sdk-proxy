@@ -51,6 +51,12 @@ namespace M365ProxyAgent.UnitTests.Builders
             return this;
         }
 
+        public ActivityBuilder WithName(string name)
+        {
+            _activity.Name = name;
+            return this;
+        }
+
         public Activity Build() => _activity;
 
         public static Activity CreateMessageActivity(string text = "Test message")
@@ -66,6 +72,14 @@ namespace M365ProxyAgent.UnitTests.Builders
             return new ActivityBuilder()
                 .WithType(ActivityTypes.ConversationUpdate)
                 .WithMembersAdded(member)
+                .Build();
+        }
+
+        public static Activity CreateEventActivity(string eventName = "test-event")
+        {
+            return new ActivityBuilder()
+                .WithType(ActivityTypes.Event)
+                .WithName(eventName)
                 .Build();
         }
 
